@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: my_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: testUser
+      POSTGRES_PASSWORD: testPassword
+      POSTGRES_DB: testDB
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network  # Указываем, что сервис postgres использует сеть app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:  # Определяем сеть app-network
+    driver: bridge

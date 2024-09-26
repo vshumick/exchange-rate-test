@@ -1,0 +1,8 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url "https://repo.gradle.org/gradle/repo" }
+    }
+}
+rootProject.name = 'exchange-rate-test'

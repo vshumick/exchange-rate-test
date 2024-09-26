@@ -1,0 +1,73 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: testUser
+      changes:
+        - createTable:
+            tableName: currency
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: full_name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 2
+      author: testUser
+      changes:
+        - createTable:
+            tableName: exchange_rate
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: source_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quote_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rate
+                  type: DECIMAL(18, 6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_updated
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: exchange_rate
+            baseColumnNames: source_id
+            referencedTableName: currency
+            referencedColumnNames: id
+            constraintName: fk_source_currency
+        - addForeignKeyConstraint:
+            baseTableName: exchange_rate
+            baseColumnNames: quote_id
+            referencedTableName: currency
+            referencedColumnNames: id
+            constraintName: fk_quote_currency

@@ -1,0 +1,31 @@
+currencylayer:
+  api:
+    access_key: 79b6f4b3b363cab3df06a8d48e7e3af5 #2874e4c911db5ab4fab2e4ffe08de851
+    base_url: https://api.currencylayer.com
+
+spring:
+  application:
+    name: exchange-rate-test
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testDB
+    username: testUser
+    password: testPassword
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10  # Опционально: настройка пула соединений
+
+  jpa:
+    hibernate:
+      ddl-auto: none  # Важно: Отключить автоматическое изменение схемы через Hibernate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true  # Показывать SQL запросы в логах
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    enabled: true  # Убедитесь, что Liquibase включен
+
+# Enable scheduling for your application
+scheduling:
+  enabled: true
