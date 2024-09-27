@@ -17,8 +17,7 @@ public class CurrencyScheduler {
     }
 
     // Runs every hour to update currencies and exchange rates
-    //@Scheduled(fixedRate = 3600000)
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(fixedRate = 3600000)
     public void updateCurrencyAndExchangeRates() {
         //currencyService.updateCurrencies();
         exchangeRateService.updateExchangeRates();

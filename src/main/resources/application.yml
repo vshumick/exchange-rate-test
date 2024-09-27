@@ -12,20 +12,20 @@ spring:
     password: testPassword
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10  # Опционально: настройка пула соединений
+      maximum-pool-size: 10
 
   jpa:
     hibernate:
-      ddl-auto: none  # Важно: Отключить автоматическое изменение схемы через Hibernate
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true  # Показывать SQL запросы в логах
+    show-sql: true
 
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
-    enabled: true  # Убедитесь, что Liquibase включен
+    enabled: true
 
-# Enable scheduling for your application
+# Enable scheduling
 scheduling:
   enabled: true

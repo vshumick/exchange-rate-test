@@ -2,12 +2,17 @@ package com.viktor.task.kyiv.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)  // Игнорировать поля с null при сериализации
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExchangeRate {
 
     @Id

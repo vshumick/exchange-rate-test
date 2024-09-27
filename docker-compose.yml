@@ -12,11 +12,11 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - app-network  # Указываем, что сервис postgres использует сеть app-network
+      - app-network
 
 volumes:
   postgres_data:
 
 networks:
-  app-network:  # Определяем сеть app-network
+  app-network:
     driver: bridge
