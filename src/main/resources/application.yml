@@ -29,3 +29,4 @@ spring:
 # Enable scheduling
 scheduling:
   enabled: true
+  fixed-rate: 3600000  # 1 час в миллисекундах
