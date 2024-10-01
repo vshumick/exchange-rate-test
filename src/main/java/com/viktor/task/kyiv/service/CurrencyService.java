@@ -4,6 +4,7 @@ import com.viktor.task.kyiv.model.Currency;
 import com.viktor.task.kyiv.repository.CurrencyRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // Импортируем аннотацию @Transactional
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class CurrencyService {
     }
 
     // Fetch all currencies and update the currency table
+    @Transactional
     public void updateCurrencies() {
         String url = String.format("%s/list?access_key=%s", baseUrl, accessKey);
         Map<String, Object> response = restTemplate.getForObject(url, Map.class);
@@ -49,6 +51,7 @@ public class CurrencyService {
         return currencyRepository.findAll();
     }
 
+    @Transactional
     public Currency addOrUpdateCurrency(Currency currency) {
         Optional<Currency> existingCurrency = currencyRepository.findByName(currency.getName());
         if (existingCurrency.isPresent()) {

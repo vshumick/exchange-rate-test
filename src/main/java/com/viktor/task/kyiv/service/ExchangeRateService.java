@@ -6,10 +6,13 @@ import com.viktor.task.kyiv.repository.CurrencyRepository;
 import com.viktor.task.kyiv.repository.ExchangeRateRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ExchangeRateService {
@@ -18,7 +21,7 @@ public class ExchangeRateService {
     private final ExchangeRateRepository exchangeRateRepository;
     private final RestTemplate restTemplate;
 
-    private final Map<String, ExchangeRate> exchangeRateCache = new HashMap<>();
+    private final Map<String, ExchangeRate> exchangeRateCache = new ConcurrentHashMap<>();
 
     @Value("${currencylayer.api.access_key}")
     private String accessKey;
@@ -34,12 +37,15 @@ public class ExchangeRateService {
         this.restTemplate = restTemplate;
     }
 
+    @Transactional
     public void updateExchangeRates() {
         List<Currency> currencies = currencyRepository.findAll();
 
         if (currencies.size() < 2) {
-            throw new IllegalStateException("Недостаточно валют для получения курсов обмена.");
+            throw new IllegalStateException("Not enough currencies to get exchange rates.");
         }
+
+        List<ExchangeRate> exchangeRatesToSave = new ArrayList<>();
 
         for (Currency sourceCurrency : currencies) {
             StringBuilder targetCurrencyCodes = new StringBuilder();
@@ -64,8 +70,8 @@ public class ExchangeRateService {
 
                 for (Map.Entry<String, Object> rateEntry : rates.entrySet()) {
                     String quote = rateEntry.getKey();
-                    String fromCurrencyCode = quote.substring(0, 3); // Валюта source
-                    String toCurrencyCode = quote.substring(3); // Валюта target
+                    String fromCurrencyCode = quote.substring(0, 3);
+                    String toCurrencyCode = quote.substring(3);
 
                     Currency fromCurrency = currencyRepository.findByName(fromCurrencyCode).orElse(null);
                     Currency toCurrency = currencyRepository.findByName(toCurrencyCode).orElse(null);
@@ -75,22 +81,30 @@ public class ExchangeRateService {
                         exchangeRate.setSourceCurrency(fromCurrency);
                         exchangeRate.setQuoteCurrency(toCurrency);
 
+                        // Преобразование rate в BigDecimal
                         if (rateEntry.getValue() instanceof Integer) {
-                            exchangeRate.setRate(((Integer) rateEntry.getValue()).doubleValue());
+                            exchangeRate.setRate(BigDecimal.valueOf((Integer) rateEntry.getValue()));
                         } else if (rateEntry.getValue() instanceof Double) {
-                            exchangeRate.setRate((Double) rateEntry.getValue());
+                            exchangeRate.setRate(BigDecimal.valueOf((Double) rateEntry.getValue()));
                         }
 
                         exchangeRate.setLastUpdated(LocalDateTime.now());
 
-                        exchangeRateRepository.save(exchangeRate);
+                        // Добавляем объект в список для сохранения
+                        exchangeRatesToSave.add(exchangeRate);
 
                         exchangeRateCache.put(fromCurrency.getId() + "_" + toCurrency.getId(), exchangeRate);
                     }
                 }
             }
         }
+
+        // Сохраняем все объекты за один раз
+        if (!exchangeRatesToSave.isEmpty()) {
+            exchangeRateRepository.saveAll(exchangeRatesToSave);
+        }
     }
+
     public List<ExchangeRate> getAllExchangeRatesFromCache() {
         return new ArrayList<>(exchangeRateCache.values());
     }
